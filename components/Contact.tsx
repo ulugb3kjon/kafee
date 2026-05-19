@@ -1,163 +1,91 @@
 "use client";
 
-import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { Phone, Mail, MapPin, Send, CheckCircle } from "lucide-react";
+import { Phone, Mail, MapPin, Send, ArrowRight } from "lucide-react";
 import { CAFE_CONFIG } from "@/config/cafe.config";
 import { useLang } from "@/contexts/LanguageContext";
-import { slideLeft, slideRight, fadeUp, VIEWPORT, btnHover, btnTap } from "@/lib/animations";
+import { fadeUp, VIEWPORT } from "@/lib/animations";
 
 export default function Contact() {
+  const router = useRouter();
   const { t } = useLang();
-  const [form, setForm] = useState({ name: "", phone: "", message: "" });
-  const [sent, setSent] = useState(false);
-  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLoading(true);
-    await new Promise((r) => setTimeout(r, 1000));
-    setSent(true);
-    setLoading(false);
-  };
-
-  const socials = [
-    { label: "Instagram", handle: CAFE_CONFIG.contacts.instagram, href: `https://instagram.com/${CAFE_CONFIG.contacts.instagram.replace("@", "")}` },
-    { label: "Telegram", handle: CAFE_CONFIG.contacts.telegram, href: `https://t.me/${CAFE_CONFIG.contacts.telegram.replace("@", "")}` },
-    { label: "WhatsApp", handle: CAFE_CONFIG.contacts.whatsapp, href: `https://wa.me/${CAFE_CONFIG.contacts.whatsapp.replace(/\D/g, "")}` },
+  const items = [
+    { icon: Phone, label: t.contact.phone, value: CAFE_CONFIG.contacts.phone, href: `tel:${CAFE_CONFIG.contacts.phone.replace(/\s/g, "")}` },
+    { icon: MapPin, label: t.contact.address, value: CAFE_CONFIG.branches[0].address, href: undefined },
+    { icon: Mail, label: t.contact.email, value: CAFE_CONFIG.contacts.email, href: `mailto:${CAFE_CONFIG.contacts.email}` },
+    { icon: Send, label: "Telegram", value: CAFE_CONFIG.contacts.telegram, href: `https://t.me/${CAFE_CONFIG.contacts.telegram.replace("@", "")}` },
   ];
 
   return (
-    <section id="contact" className="py-20 bg-amber-50 overflow-hidden">
-      <div className="container mx-auto px-4">
+    <section id="contact" className="py-24 overflow-hidden" style={{ backgroundColor: "#111" }}>
+      <div className="container mx-auto px-4 max-w-5xl">
+
         <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={VIEWPORT}
-          variants={fadeUp}
+          initial="hidden" whileInView="visible" viewport={VIEWPORT} variants={fadeUp}
           className="text-center mb-12"
         >
-          <span className="text-amber-700 font-medium uppercase tracking-widest text-sm">{t.contact.badge}</span>
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mt-2 font-serif">{t.contact.title}</h2>
+          <span className="text-[11px] font-bold uppercase tracking-[0.28em]" style={{ color: "#FDE080" }}>
+            {t.contact.badge}
+          </span>
+          <h2 className="text-4xl md:text-5xl font-bold text-white mt-4 mb-4 font-serif">
+            {t.contact.title}
+          </h2>
+          <p className="text-white/40 text-base max-w-md mx-auto">
+            Savollaringiz bormi? Biz doim muloqotga tayyormiz
+          </p>
         </motion.div>
 
-        <div className="grid lg:grid-cols-2 gap-12 max-w-5xl mx-auto">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={VIEWPORT}
-            variants={slideLeft}
+        <motion.div
+          initial="hidden" whileInView="visible" viewport={VIEWPORT}
+          variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.08 } } }}
+          className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-10"
+        >
+          {items.map(({ icon: Icon, label, value, href }) => {
+            const content = (
+              <motion.div
+                variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.45 } } }}
+                className="flex flex-col items-center text-center gap-3 p-5 rounded-2xl transition-all"
+                style={{ backgroundColor: "#0d0d0d", border: "1px solid rgba(255,255,255,0.07)" }}
+                whileHover={{ borderColor: "rgba(253,224,128,0.25)", y: -3 }}
+                transition={{ duration: 0.2 }}
+              >
+                <div className="w-11 h-11 rounded-xl flex items-center justify-center" style={{ backgroundColor: "rgba(253,224,128,0.1)" }}>
+                  <Icon className="w-5 h-5" style={{ color: "#FDE080" }} />
+                </div>
+                <div>
+                  <p className="text-xs mb-1" style={{ color: "rgba(255,255,255,0.3)" }}>{label}</p>
+                  <p className="text-sm font-semibold text-white leading-tight">{value}</p>
+                </div>
+              </motion.div>
+            );
+            return href ? <a key={label} href={href} target={href.startsWith("http") ? "_blank" : undefined} rel="noopener noreferrer">{content}</a> : <div key={label}>{content}</div>;
+          })}
+        </motion.div>
+
+        <motion.div
+          initial="hidden" whileInView="visible" viewport={VIEWPORT} variants={fadeUp}
+          className="flex justify-center"
+        >
+          <motion.button
+            onClick={() => router.push("/contact")}
+            className="group flex items-center gap-3 px-8 py-4 rounded-full font-semibold text-sm transition-all"
+            style={{ backgroundColor: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.7)" }}
+            whileHover={{ backgroundColor: "#FDE080", borderColor: "#FDE080", color: "#0a0a0a", scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            transition={{ duration: 0.22 }}
           >
-            <h3 className="text-xl font-bold text-gray-900 mb-6">{t.contact.info}</h3>
-
-            <div className="space-y-4 mb-8">
-              {[
-                { icon: Phone, label: t.contact.phone, value: CAFE_CONFIG.contacts.phone, href: `tel:${CAFE_CONFIG.contacts.phone.replace(/\s/g, "")}` },
-                { icon: MapPin, label: t.contact.address, value: CAFE_CONFIG.branches[0].address, href: undefined },
-                { icon: Mail, label: t.contact.email, value: CAFE_CONFIG.contacts.email, href: `mailto:${CAFE_CONFIG.contacts.email}` },
-              ].map(({ icon: Icon, label, value, href }) => (
-                <motion.div key={label} whileHover={{ x: 4 }}>
-                  {href ? (
-                    <a href={href} className="flex items-center gap-4 p-4 bg-white rounded-xl hover:shadow-md transition-shadow group">
-                      <div className="w-11 h-11 bg-amber-100 rounded-xl flex items-center justify-center group-hover:bg-amber-800 transition-colors">
-                        <Icon className="w-5 h-5 text-amber-800 group-hover:text-white transition-colors" />
-                      </div>
-                      <div><p className="text-xs text-gray-500">{label}</p><p className="font-semibold text-gray-900">{value}</p></div>
-                    </a>
-                  ) : (
-                    <div className="flex items-center gap-4 p-4 bg-white rounded-xl">
-                      <div className="w-11 h-11 bg-amber-100 rounded-xl flex items-center justify-center">
-                        <Icon className="w-5 h-5 text-amber-800" />
-                      </div>
-                      <div><p className="text-xs text-gray-500">{label}</p><p className="font-semibold text-gray-900">{value}</p></div>
-                    </div>
-                  )}
-                </motion.div>
-              ))}
-            </div>
-
-            <h4 className="font-semibold text-gray-900 mb-4">{t.contact.social}</h4>
-            <div className="flex flex-col gap-3">
-              {socials.map((s) => (
-                <motion.a
-                  key={s.label}
-                  href={s.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-3 text-gray-600 hover:text-amber-800 transition-colors font-medium"
-                  whileHover={{ x: 6 }}
-                >
-                  <span className="text-sm w-24 font-semibold">{s.label}</span>
-                  <span className="text-sm">{s.handle}</span>
-                </motion.a>
-              ))}
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={VIEWPORT}
-            variants={slideRight}
-          >
-            <div className="bg-white rounded-2xl p-6 shadow-sm">
-              <h3 className="text-xl font-bold text-gray-900 mb-6">{t.contact.form.title}</h3>
-              {sent ? (
-                <motion.div
-                  initial={{ scale: 0.9, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  className="text-center py-10"
-                >
-                  <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-                  <p className="text-lg font-semibold text-gray-900 mb-2">{t.contact.form.success}</p>
-                  <p className="text-gray-500 text-sm">{t.contact.form.successDesc}</p>
-                  <button onClick={() => { setSent(false); setForm({ name: "", phone: "", message: "" }); }} className="mt-6 text-amber-800 font-medium hover:underline">
-                    {t.contact.form.newMessage}
-                  </button>
-                </motion.div>
-              ) : (
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  {[
-                    { key: "name", label: t.contact.form.name, placeholder: t.contact.form.namePlaceholder, type: "text" },
-                    { key: "phone", label: t.contact.form.phone, placeholder: t.contact.form.phonePlaceholder, type: "tel" },
-                  ].map(({ key, label, placeholder, type }) => (
-                    <div key={key}>
-                      <label className="block text-sm font-medium text-gray-700 mb-1.5">{label}</label>
-                      <input
-                        type={type}
-                        required
-                        value={form[key as keyof typeof form]}
-                        onChange={(e) => setForm({ ...form, [key]: e.target.value })}
-                        placeholder={placeholder}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-amber-800 transition-colors"
-                      />
-                    </div>
-                  ))}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">{t.contact.form.message}</label>
-                    <textarea
-                      required
-                      rows={4}
-                      value={form.message}
-                      onChange={(e) => setForm({ ...form, message: e.target.value })}
-                      placeholder={t.contact.form.messagePlaceholder}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-amber-800 transition-colors resize-none"
-                    />
-                  </div>
-                  <motion.button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full py-3.5 bg-amber-800 text-white rounded-full font-semibold hover:bg-amber-700 disabled:opacity-70 transition-all flex items-center justify-center gap-2"
-                    whileHover={btnHover}
-                    whileTap={btnTap}
-                  >
-                    {loading ? t.contact.form.sending : <><Send className="w-4 h-4" />{t.contact.form.send}</>}
-                  </motion.button>
-                </form>
-              )}
-            </div>
-          </motion.div>
-        </div>
+            Xabar yuborish — batafsil
+            <motion.span
+              className="flex items-center"
+              animate={{ x: [0, 4, 0] }}
+              transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
+            >
+              <ArrowRight className="w-4 h-4" />
+            </motion.span>
+          </motion.button>
+        </motion.div>
       </div>
     </section>
   );

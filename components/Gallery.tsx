@@ -1,91 +1,88 @@
 "use client";
 
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { X, ZoomIn } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
+import { ArrowRight, Images } from "lucide-react";
 import { CAFE_CONFIG } from "@/config/cafe.config";
 import { useLang } from "@/contexts/LanguageContext";
-import { fadeUp, stagger, staggerItem, VIEWPORT } from "@/lib/animations";
+import { fadeUp, VIEWPORT } from "@/lib/animations";
 
 export default function Gallery() {
+  const router = useRouter();
   const { t } = useLang();
-  const [selected, setSelected] = useState<string | null>(null);
+  const preview = CAFE_CONFIG.gallery.slice(0, 5);
 
   return (
-    <section id="gallery" className="py-20 bg-gray-50 overflow-hidden">
-      <div className="container mx-auto px-4">
+    <section id="gallery" className="py-24 overflow-hidden" style={{ backgroundColor: "#0a0a0a" }}>
+      <div className="container mx-auto px-4 max-w-5xl">
+
         <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={VIEWPORT}
-          variants={fadeUp}
+          initial="hidden" whileInView="visible" viewport={VIEWPORT} variants={fadeUp}
           className="text-center mb-12"
         >
-          <span className="text-amber-700 font-medium uppercase tracking-widest text-sm">{t.gallery.badge}</span>
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mt-2 font-serif">{t.gallery.title}</h2>
+          <span className="text-[11px] font-bold uppercase tracking-[0.28em]" style={{ color: "#FDE080" }}>
+            {t.gallery.badge}
+          </span>
+          <h2 className="text-4xl md:text-5xl font-bold text-white mt-4 mb-4 font-serif">
+            {t.gallery.title}
+          </h2>
+          <p className="text-white/40 text-base max-w-md mx-auto">
+            Kafemizdagi issiq muhit va ajoyib lahzalar
+          </p>
         </motion.div>
 
         <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={VIEWPORT}
-          variants={stagger}
-          className="columns-2 md:columns-3 gap-4 space-y-4"
+          initial="hidden" whileInView="visible" viewport={VIEWPORT}
+          variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.07 } } }}
+          className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-10"
         >
-          {CAFE_CONFIG.gallery.map((src, i) => (
+          {preview.map((src, i) => (
             <motion.div
               key={src}
-              variants={staggerItem}
-              className="break-inside-avoid group relative cursor-pointer rounded-xl overflow-hidden mb-4"
-              onClick={() => setSelected(src)}
-              whileHover={{ scale: 1.03, y: -3 }}
-              transition={{ duration: 0.25 }}
+              variants={{ hidden: { opacity: 0, scale: 0.96 }, visible: { opacity: 1, scale: 1, transition: { duration: 0.45 } } }}
+              className={`relative overflow-hidden rounded-2xl ${i === 0 ? "md:col-span-2 md:row-span-2" : ""}`}
+              style={{ aspectRatio: i === 0 ? "unset" : "1", height: i === 0 ? "100%" : undefined, minHeight: i === 0 ? 320 : 140 }}
+              whileHover={{ scale: 1.02 }}
+              transition={{ duration: 0.3 }}
             >
               <img
                 src={src}
                 alt={`Galereya ${i + 1}`}
-                className="w-full object-cover group-hover:brightness-90 transition-all duration-400"
+                className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20">
-                <div className="bg-white/90 rounded-full p-3">
-                  <ZoomIn className="w-5 h-5 text-amber-800" />
-                </div>
+              <div
+                className="absolute inset-0 opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center justify-center"
+                style={{ background: "rgba(0,0,0,0.4)" }}
+              >
+                <Images className="w-7 h-7 text-white" />
               </div>
             </motion.div>
           ))}
         </motion.div>
-      </div>
 
-      <AnimatePresence>
-        {selected && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/92 z-50 flex items-center justify-center p-4"
-            onClick={() => setSelected(null)}
+        <motion.div
+          initial="hidden" whileInView="visible" viewport={VIEWPORT} variants={fadeUp}
+          className="flex justify-center"
+        >
+          <motion.button
+            onClick={() => router.push("/gallery")}
+            className="group flex items-center gap-3 px-8 py-4 rounded-full font-semibold text-sm transition-all"
+            style={{ backgroundColor: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.7)" }}
+            whileHover={{ backgroundColor: "#FDE080", borderColor: "#FDE080", color: "#0a0a0a", scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            transition={{ duration: 0.22 }}
           >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              transition={{ type: "spring", damping: 25, stiffness: 220 }}
-              className="relative max-w-4xl max-h-[90vh]"
-              onClick={(e) => e.stopPropagation()}
+            Barcha rasmlar — batafsil
+            <motion.span
+              className="flex items-center"
+              animate={{ x: [0, 4, 0] }}
+              transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
             >
-              <img src={selected} alt="Kafe rasmi" className="max-w-full max-h-[85vh] object-contain rounded-xl shadow-2xl" />
-              <motion.button
-                onClick={() => setSelected(null)}
-                className="absolute top-3 right-3 bg-black/60 text-white rounded-full p-2.5 hover:bg-black/80 transition-colors"
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <X className="w-5 h-5" />
-              </motion.button>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+              <ArrowRight className="w-4 h-4" />
+            </motion.span>
+          </motion.button>
+        </motion.div>
+      </div>
     </section>
   );
 }

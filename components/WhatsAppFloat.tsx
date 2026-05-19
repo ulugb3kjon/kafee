@@ -26,7 +26,7 @@ export default function PhoneFloat() {
             animate={{ opacity: 1, x: 0, scale: 1 }}
             exit={{ opacity: 0, x: 12, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="mr-3 bg-gray-900 text-white text-sm font-semibold px-4 py-2.5 rounded-full shadow-lg whitespace-nowrap"
+            className="mr-3 bg-[#1a1a1a] border border-white/10 text-white text-sm font-semibold px-4 py-2.5 rounded-full shadow-xl whitespace-nowrap"
           >
             {phone}
           </motion.a>
@@ -35,8 +35,8 @@ export default function PhoneFloat() {
 
       {/* Pulse rings */}
       <div className="relative">
-        <span className="absolute inset-0 rounded-full bg-amber-800/30 animate-ping" />
-        <span className="absolute inset-0 rounded-full bg-amber-800/15 animate-ping [animation-delay:0.4s]" />
+        <span className="absolute inset-0 rounded-full bg-[#FDE080]/20 animate-ping" />
+        <span className="absolute inset-0 rounded-full bg-[#FDE080]/10 animate-ping [animation-delay:0.4s]" />
 
         {/* Button */}
         <motion.a
@@ -46,7 +46,7 @@ export default function PhoneFloat() {
           onMouseLeave={() => setHovered(false)}
           onFocus={() => setHovered(true)}
           onBlur={() => setHovered(false)}
-          className="relative w-14 h-14 bg-amber-800 rounded-full flex items-center justify-center shadow-xl shadow-amber-900/30"
+          className="relative w-14 h-14 bg-[#FDE080] rounded-full flex items-center justify-center shadow-xl shadow-[#FDE080]/20"
           whileHover={{ scale: 1.12 }}
           whileTap={{ scale: 0.92 }}
         >
@@ -54,7 +54,7 @@ export default function PhoneFloat() {
             animate={{ rotate: hovered ? [0, -15, 15, -10, 10, 0] : 0 }}
             transition={{ duration: 0.5 }}
           >
-            <Phone className="w-6 h-6 text-white fill-white/20" />
+            <Phone className="w-6 h-6 text-[#0a0a0a] fill-[#0a0a0a]/20" />
           </motion.div>
         </motion.a>
       </div>

@@ -335,7 +335,7 @@ export const CAFE_CONFIG = {
 
   delivery: {
     enabled: true,
-    minOrder: 50000,
+    minOrder: 0,
     deliveryFee: 10000,
     freeDeliveryFrom: 150000,
     deliveryTime: "30-60 daqiqa",

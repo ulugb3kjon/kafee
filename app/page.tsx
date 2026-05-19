@@ -1,16 +1,16 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { AnimatePresence } from "framer-motion";
+import { useRouter } from "next/navigation";
+import { AnimatePresence, motion } from "framer-motion";
 
 import Loader from "@/components/Loader";
-import Header from "@/components/Header";
+import SidebarNav from "@/components/SidebarNav";
 import Hero from "@/components/Hero";
-import NewProducts from "@/components/NewProducts";
+import CoffeeShowcase from "@/components/CoffeeShowcase";
 import About from "@/components/About";
 import Menu from "@/components/Menu";
 import Promotions from "@/components/Promotions";
-import Order from "@/components/Order";
 import Branches from "@/components/Branches";
 import Gallery from "@/components/Gallery";
 import Reviews from "@/components/Reviews";
@@ -25,9 +25,11 @@ import { CartItem, MenuItem } from "@/types";
 import { getCart, addToCart, removeFromCart, updateQuantity } from "@/lib/cart";
 
 export default function Home() {
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [cartOpen, setCartOpen] = useState(false);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     setCartItems(getCart());
@@ -43,7 +45,7 @@ export default function Home() {
 
   return (
     <>
-      <AnimatePresence>{loading && <Loader />}</AnimatePresence>
+      <AnimatePresence mode="wait">{loading && <Loader />}</AnimatePresence>
       <ScrollProgress />
 
       <Cart
@@ -54,26 +56,41 @@ export default function Home() {
         onRemove={(name) => setCartItems([...removeFromCart(name)])}
         onCheckout={() => {
           setCartOpen(false);
-          document.querySelector("#order")?.scrollIntoView({ behavior: "smooth" });
+          router.push("/order");
         }}
       />
 
-      <Header cartItems={cartItems} onCartClick={() => setCartOpen(true)} />
+      <SidebarNav
+        isOpen={sidebarOpen}
+        onToggle={() => setSidebarOpen((v) => !v)}
+        onClose={() => setSidebarOpen(false)}
+        cartItems={cartItems}
+        onCartClick={() => {
+          setSidebarOpen(false);
+          setCartOpen(true);
+        }}
+      />
 
-      <main>
-        <Hero />
-        <NewProducts onAddToCart={handleAddToCart} />
-        <About />
-        <Promotions />
-        <Menu onAddToCart={handleAddToCart} />
-        <Order cartItems={cartItems} onOrderComplete={() => { setCartItems([]); setCartOpen(false); }} />
-        <Branches />
-        <Gallery />
-        <Reviews />
-        <Contact />
-      </main>
+      {/* Main content shifts left when sidebar opens */}
+      <motion.div
+        animate={{ x: sidebarOpen ? "-33vw" : 0 }}
+        transition={{ duration: 0.55, ease: [0.76, 0, 0.24, 1] }}
+      >
+        <main>
+          <Hero />
+          <CoffeeShowcase />
+          <About />
+          <Promotions />
+          <Menu onAddToCart={handleAddToCart} />
+          <Branches />
+          <Gallery />
+          <Reviews />
+          <Contact />
+        </main>
 
-      <Footer />
+        <Footer />
+      </motion.div>
+
       <BackToTop />
       <WhatsAppFloat />
     </>

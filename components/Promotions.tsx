@@ -1,21 +1,21 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, Sparkles, Flame, Star, Zap } from "lucide-react";
-import { CAFE_CONFIG } from "@/config/cafe.config";
+import { Sparkles, Flame, Star, Zap, ArrowRight } from "lucide-react";
 import { useLang } from "@/contexts/LanguageContext";
-import { fadeUp, VIEWPORT, btnHover, btnTap } from "@/lib/animations";
+import { fadeUp, VIEWPORT } from "@/lib/animations";
 
 const GRADIENTS = [
-  "from-amber-600 to-orange-500",
-  "from-amber-800 to-amber-600",
-  "from-stone-700 to-amber-700",
+  "linear-gradient(135deg, #4a2800 0%, #8B4513 100%)",
+  "linear-gradient(135deg, #1a0a00 0%, #5C3A0A 100%)",
+  "linear-gradient(135deg, #0e0800 0%, #4a3000 100%)",
 ];
-
 const BADGE_ICONS = [Flame, Star, Zap];
 
 export default function Promotions() {
+  const router = useRouter();
   const { t } = useLang();
   const [current, setCurrent] = useState(0);
   const promos = t.promotions.items;
@@ -28,65 +28,81 @@ export default function Promotions() {
   const BadgeIcon = BADGE_ICONS[current % BADGE_ICONS.length];
 
   return (
-    <section className="py-16 bg-white overflow-hidden">
-      <div className="container mx-auto px-4">
-        <motion.div initial="hidden" whileInView="visible" viewport={VIEWPORT} variants={fadeUp} className="text-center mb-10">
-          <span className="inline-flex items-center gap-2 text-amber-700 font-medium uppercase tracking-widest text-sm">
-            <Sparkles className="w-4 h-4" />{t.promotions.badge}
+    <section className="py-24 overflow-hidden" style={{ backgroundColor: "#080808" }}>
+      <div className="container mx-auto px-4 max-w-5xl">
+
+        <motion.div
+          initial="hidden" whileInView="visible" viewport={VIEWPORT} variants={fadeUp}
+          className="text-center mb-10"
+        >
+          <span className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.28em]" style={{ color: "#FDE080" }}>
+            <Sparkles className="w-3.5 h-3.5" />{t.promotions.badge}
           </span>
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mt-2 font-serif">{t.promotions.title}</h2>
+          <h2 className="text-4xl md:text-5xl font-bold text-white mt-4 font-serif">
+            {t.promotions.title}
+          </h2>
         </motion.div>
 
-        <div className="relative max-w-4xl mx-auto">
+        <div className="relative max-w-3xl mx-auto mb-10">
           <AnimatePresence mode="wait">
             <motion.div
-              key={`${current}-${t.promotions.badge}`}
+              key={current}
               initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -30 }}
               transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
             >
-              <div className={`relative bg-linear-to-br ${GRADIENTS[current]} rounded-3xl p-8 md:p-12 text-white overflow-hidden shadow-lg`}>
-                <div className="absolute top-0 right-0 w-72 h-72 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/3 pointer-events-none" />
-                <div className="absolute bottom-0 left-0 w-48 h-48 bg-black/5 rounded-full translate-y-1/3 -translate-x-1/4 pointer-events-none" />
+              <div
+                className="relative rounded-3xl p-8 md:p-10 text-white overflow-hidden"
+                style={{ background: GRADIENTS[current], border: "1px solid rgba(255,255,255,0.08)" }}
+              >
+                <div className="absolute top-0 right-0 w-64 h-64 rounded-full pointer-events-none" style={{ background: "rgba(255,255,255,0.04)", transform: "translate(30%,-50%)" }} />
                 <div className="relative z-10">
-                  <span className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-1.5 rounded-full text-sm font-semibold mb-4">
+                  <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-semibold mb-4" style={{ backgroundColor: "rgba(253,224,128,0.12)", border: "1px solid rgba(253,224,128,0.2)", color: "#FDE080" }}>
                     <BadgeIcon className="w-3.5 h-3.5" />
                     {promos[current].badge}
                   </span>
                   <h3 className="text-2xl md:text-3xl font-bold mb-3 font-serif leading-snug">{promos[current].title}</h3>
-                  <p className="text-white/85 text-base max-w-lg mb-7">{promos[current].desc}</p>
-                  <motion.button
-                    onClick={() => document.querySelector("#menu")?.scrollIntoView({ behavior: "smooth" })}
-                    className="inline-flex items-center gap-2 bg-white text-amber-800 font-semibold px-7 py-3 rounded-full hover:bg-amber-50 transition-colors shadow"
-                    whileHover={btnHover} whileTap={btnTap}
-                  >
-                    {t.nav.menu} →
-                  </motion.button>
+                  <p className="text-white/65 text-base max-w-lg">{promos[current].desc}</p>
                 </div>
               </div>
             </motion.div>
           </AnimatePresence>
 
-          <div className="flex items-center justify-center gap-4 mt-6">
-            <motion.button onClick={() => setCurrent((c) => (c - 1 + promos.length) % promos.length)}
-              className="w-9 h-9 bg-gray-100 hover:bg-amber-100 rounded-full flex items-center justify-center transition-colors"
-              whileHover={btnHover} whileTap={btnTap}>
-              <ChevronLeft className="w-4 h-4 text-gray-600" />
-            </motion.button>
-            <div className="flex gap-2">
-              {promos.map((_, i) => (
-                <button key={i} onClick={() => setCurrent(i)}
-                  className={`h-1.5 rounded-full transition-all duration-300 ${i === current ? "w-8 bg-amber-800" : "w-2 bg-gray-300"}`} />
-              ))}
-            </div>
-            <motion.button onClick={() => setCurrent((c) => (c + 1) % promos.length)}
-              className="w-9 h-9 bg-gray-100 hover:bg-amber-100 rounded-full flex items-center justify-center transition-colors"
-              whileHover={btnHover} whileTap={btnTap}>
-              <ChevronRight className="w-4 h-4 text-gray-600" />
-            </motion.button>
+          <div className="flex items-center justify-center gap-2 mt-5">
+            {promos.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrent(i)}
+                className="rounded-full transition-all duration-300"
+                style={{ height: 6, width: i === current ? 32 : 8, backgroundColor: i === current ? "#FDE080" : "rgba(255,255,255,0.15)" }}
+              />
+            ))}
           </div>
         </div>
+
+        <motion.div
+          initial="hidden" whileInView="visible" viewport={VIEWPORT} variants={fadeUp}
+          className="flex justify-center"
+        >
+          <motion.button
+            onClick={() => router.push("/promotions")}
+            className="group flex items-center gap-3 px-8 py-4 rounded-full font-semibold text-sm transition-all"
+            style={{ backgroundColor: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.7)" }}
+            whileHover={{ backgroundColor: "#FDE080", borderColor: "#FDE080", color: "#0a0a0a", scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            transition={{ duration: 0.22 }}
+          >
+            Barcha aksiyalar — batafsil
+            <motion.span
+              className="flex items-center"
+              animate={{ x: [0, 4, 0] }}
+              transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
+            >
+              <ArrowRight className="w-4 h-4" />
+            </motion.span>
+          </motion.button>
+        </motion.div>
       </div>
     </section>
   );
